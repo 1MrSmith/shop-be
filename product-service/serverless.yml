@@ -1,0 +1,36 @@
+service: product-service
+
+plugins:
+  - serverless-s3-deploy
+  - serverless-functions-base-path
+  - serverless-webpack
+
+frameworkVersion: '3.25'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: eu-west-1
+  apiName: products-api
+
+custom:
+  functionsBasePath: src/handlers
+  webpack:
+    webpackConfig: "./webpack.config.js"
+    includeModules: true
+    keepOutputDirectory: true
+
+functions:
+  getProductsList:
+    handler: products/get-products-list.handler
+    events:
+      - http:
+          path: api/products
+          method: get
+
+  getProductById:
+    handler: product-by-id/get-product-by-id.handler
+    events:
+      - http:
+          path: api/products/{id}
+          method: get
