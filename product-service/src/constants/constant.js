@@ -19,3 +19,6 @@ export const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "OPTIONS,GET"
 }
+
+export const stocksTableName = 'Stocks'
+export const productsTableName = 'Products'
