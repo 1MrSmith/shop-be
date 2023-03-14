@@ -1,5 +1,13 @@
-import {createSuccessResponse} from '../../utils/api'
+import {createSuccessResponse, createErrorResponse} from '../../utils/api'
+import {InternalServerRequestError} from '../../helpers/errors'
+import {getProductsList} from '../../services/product-service'
 
-import products from '../../mocks/products.json'
+export const handler = async () => {
+    try {
+        const products = await getProductsList()
+        return createSuccessResponse(products)
+    } catch (e) {
 
-export const handler = async () => createSuccessResponse(products)
+        return createErrorResponse(new InternalServerRequestError('Internal server error'))
+    }
+}

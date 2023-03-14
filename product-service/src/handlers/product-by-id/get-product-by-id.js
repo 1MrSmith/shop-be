@@ -1,21 +1,27 @@
-import {BadRequestError, NotFoundRequestError} from '../../helpers/errors'
+import {validate as uuidValidate} from 'uuid';
+import {BadRequestError, NotFoundRequestError, InternalServerRequestError} from '../../helpers/errors'
 import {createErrorResponse, createSuccessResponse} from '../../utils/api'
-
-import products from '../../mocks/products.json'
+import {getProductById} from '../../services/product-service'
 
 export const handler = async (event) => {
     const {id} = event.pathParameters
 
-    if (isNaN(id) || id < 0) {
+    console.log('id', id)
+
+    if (!uuidValidate(id)) {
         return createErrorResponse(new BadRequestError('Invalid id params'))
     }
 
-    const product = products.find(product => product.id === +id)
+    try {
+        const product = await getProductById(id)
 
-    if (!product) {
-        return createErrorResponse(new NotFoundRequestError(`Product with id = ${id} not found`))
+        if (!product) {
+            return createErrorResponse(new NotFoundRequestError(`Product with id = ${id} not found`))
+        }
+
+        return createSuccessResponse(product)
+    } catch (e) {
+
+        return createErrorResponse(new InternalServerRequestError('Internal server error'))
     }
-
-
-    return createSuccessResponse(product)
 }
