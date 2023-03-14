@@ -1,0 +1,133 @@
+openapi: '3.0.0'
+info:
+  title: Product Service
+  description: |
+    AWS API Gateway endpoints to work with products (coins)
+  version: 0.0.1
+servers:
+  - url: https://9qhyrydex7.execute-api.eu-west-1.amazonaws.com/dev
+    description: dev
+tags:
+  - name: Coins
+paths:
+  /api/products:
+    get:
+      tags:
+        - Coins
+      summary: Get all products(coins)
+      description: Get all products(coins)
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Products'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /api/products/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Product id
+        schema:
+          type: integer
+          example: 1
+    get:
+      tags:
+        - Coins
+      summary: Get product by id
+      description: Get product by id
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+components:
+  responses:
+    BadRequest:
+      description: You did not provide the required parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestError'
+    NotFound:
+      description: Item not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFound'
+    InternalServerError:
+      description: Common server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+  schemas:
+    BadRequestError:
+      type: object
+      properties:
+        statusCode:
+          type: number
+          example: 400
+        error:
+          type: object
+          properties:
+            name:
+              type: string
+              example: 'BAD_REQUEST'
+            message:
+              type: string
+              example: 'Invalid id params'
+    NotFound:
+      type: object
+      properties:
+        statusCode:
+          type: number
+          example: 404
+        error:
+          type: object
+          properties:
+            name:
+              type: string
+              example: 'Not found'
+            message:
+              type: string
+              example: 'Product with id = 7 not found'
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: 'Internal server error'
+    Products:
+      type: array
+      items:
+        $ref: '#/components/schemas/Product'
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 6
+        count:
+          type: integer
+          example: 1
+        price:
+          type: integer
+          example: 12
+        description:
+          type: string
+          example: Great Britain, 1/2 Penny 1876, Victoria 1837-1901, Bronze
+        title:
+          type: string
+          example: 1/2 Penny 1876

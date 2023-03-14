@@ -1,0 +1,83 @@
+service: product-service
+
+plugins:
+  - serverless-s3-deploy
+  - serverless-functions-base-path
+  - serverless-webpack
+
+frameworkVersion: '3.25'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: eu-west-1
+  apiName: products-api
+  iamRoleStatements: [
+      { Effect: 'Allow', Action: ['dynamodb:*'], Resource: 'arn:aws:dynamodb:${self:provider.region}:*:table/*' },
+    ]
+
+custom:
+  functionsBasePath: src/handlers
+  webpack:
+    webpackConfig: "./webpack.config.js"
+    includeModules: true
+    keepOutputDirectory: true
+
+functions:
+  getProductsList:
+    handler: products/get-products-list.handler
+    events:
+      - http:
+          path: api/products
+          method: get
+
+  getProductById:
+    handler: product-by-id/get-product-by-id.handler
+    events:
+      - http:
+          path: api/products/{id}
+          method: get
+
+  createProduct:
+    handler: create-product/create-product.handler
+    events:
+      - http:
+          path: api/products
+          method: post
+
+resources: {
+    Resources: {
+      productsTable: {
+        Type: 'AWS::DynamoDB::Table',
+        Properties: {
+          TableName: 'Products',
+          AttributeDefinitions: [
+            { AttributeName: 'id', AttributeType: 'S' }
+          ],
+          KeySchema: [
+            { AttributeName: 'id', KeyType: 'HASH' }
+          ],
+          ProvisionedThroughput: {
+            ReadCapacityUnits: 1,
+            WriteCapacityUnits: 1,
+          }
+        }
+      },
+      stocksTable: {
+        Type: 'AWS::DynamoDB::Table',
+        Properties: {
+          TableName: 'Stocks',
+          AttributeDefinitions: [
+            { AttributeName: 'product_id', AttributeType: 'S' }
+          ],
+          KeySchema: [
+            { AttributeName: 'product_id', KeyType: 'HASH' }
+          ],
+          ProvisionedThroughput: {
+            ReadCapacityUnits: 1,
+            WriteCapacityUnits: 1,
+          }
+        }
+      },
+    },
+  }
