@@ -1,0 +1,54 @@
+service: import-service
+
+plugins:
+  - serverless-s3-deploy
+  - serverless-functions-base-path
+  - serverless-webpack
+
+frameworkVersion: '3.25'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: eu-west-1
+  apiName: imports-api
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action: "s3:ListBucket"
+      Resource:
+        - "arn:aws:s3:::upload-coins"
+    - Effect: Allow
+      Action:
+        - "s3:*"
+      Resource:
+        - "arn:aws:s3:::upload-coins/*"
+
+custom:
+  functionsBasePath: src/handlers
+  webpack:
+    webpackConfig: "./webpack.config.js"
+    includeModules: true
+    keepOutputDirectory: true
+
+functions:
+  importProductsFile:
+    handler: import-products-file/import-products-file.handler
+    events:
+      - http:
+          path: api/import
+          method: get
+          request:
+          parameters:
+            querystrings:
+              name: true
+
+  importFileParser:
+    handler: import-file-parser/import-file-parser.handler
+    events:
+      - s3:
+          bucket: upload-coins
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploaded/
+          existing: true
