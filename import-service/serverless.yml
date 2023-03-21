@@ -12,10 +12,15 @@ provider:
   runtime: nodejs18.x
   region: eu-west-1
   apiName: imports-api
+  httpApi:
+    cors: true
 
   iamRoleStatements:
     - Effect: Allow
-      Action: "s3:ListBucket"
+      Action:
+        - "s3:ListBucket"
+        - "s3:PutObject"
+        - "s3:DeleteObject"
       Resource:
         - "arn:aws:s3:::upload-coins"
     - Effect: Allow
@@ -23,6 +28,10 @@ provider:
         - "s3:*"
       Resource:
         - "arn:aws:s3:::upload-coins/*"
+    - Effect: "Allow"
+      Action:
+        - "sqs:SendMessage"
+      Resource: "arn:aws:sqs:${self:provider.region}:*:catalogItemsQueue"
 
 custom:
   functionsBasePath: src/handlers

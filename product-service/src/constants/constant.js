@@ -22,3 +22,5 @@ export const headers = {
 
 export const stocksTableName = 'Stocks'
 export const productsTableName = 'Products'
+
+export const SNS_ARN = 'arn:aws:sns:eu-west-1:954413109841:createProductTopic'

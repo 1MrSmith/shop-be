@@ -1,44 +1,7 @@
-[
-    {
-        "id": 1,
-        "price": 45,
-        "title": "2 Pence 1904",
-        "count": 4,
-        "description": "Great Britain, 2 Pence 1904, Edward VII 1901-1910, Silver"
-    },
-    {
-        "id": 2,
-        "price": 34,
-        "title": "5 Centimes 1864",
-        "count": 5,
-        "description": "France, 5 Centimes 1864, Bronze"
-    },
-    {
-        "id": 3,
-        "price": 56,
-        "title": "5 Penny 1913",
-        "count": 7,
-        "description": "Finland, 5 Penny 1913, Copper"
-    },
-    {
-        "id": 4,
-        "price": 67,
-        "title": "1 Pesos 1894",
-        "count": 9,
-        "description": "Spain, 1 Pesos 1894, Silver"
-    },
-    {
-        "id": 5,
-        "price": 45,
-        "title": "10 Centimes 1870",
-        "count": 7,
-        "description": "Luxembourg, 10 Centimes 1870, Bronze"
-    },
-    {
-        "id": 6,
-        "price": 12,
-        "title": "1/2 Penny 1876",
-        "count": 3,
-        "description": "Great Britain, 1/2 Penny 1876, Victoria 1837-1901, Bronze"
-    }
-]
+title,description,price,count
+2 Pence 1904 copy,Great Britain 2 Pence 1904 Edward VII 1901-1910 Silver,45,4
+5 Centimes 1864 copy,France 5 Centimes 1864 Bronze,34,5
+5 Penny 1913 copy,Finland 5 Penny 1913 Copper,56,7
+1 Pesos 1894 copy,Spain 1 Pesos 1894 Silver,67,9
+10 Centimes 1870 copy,Luxembourg 10 Centimes 1870 Bronze,45,7
+1/2 Penny 1876 copy,Great Britain 1/2 Penny 1876 Victoria 1837-1901 Bronze,12,3
