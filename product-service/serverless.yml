@@ -12,14 +12,29 @@ provider:
   runtime: nodejs18.x
   region: eu-west-1
   apiName: products-api
-  iamRoleStatements: [
-      { Effect: 'Allow', Action: ['dynamodb:*'], Resource: 'arn:aws:dynamodb:${self:provider.region}:*:table/*' },
-    ]
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:*
+          Resource: 'arn:aws:dynamodb:${self:provider.region}:*:table/*'
+        - Effect: Allow
+          Action:
+            - sqs:*
+          Resource:
+            Fn::GetAtt: [catalogItemsQueue, Arn]
+        - Effect: Allow
+          Action:
+            - sns:Publish
+          Resource:
+            Ref: createProductTopic
 
 custom:
   functionsBasePath: src/handlers
   webpack:
-    webpackConfig: "./webpack.config.js"
+    webpackConfig: './webpack.config.js'
     includeModules: true
     keepOutputDirectory: true
 
@@ -44,40 +59,63 @@ functions:
       - http:
           path: api/products
           method: post
+          cors: true
 
-resources: {
-    Resources: {
-      productsTable: {
-        Type: 'AWS::DynamoDB::Table',
-        Properties: {
-          TableName: 'Products',
-          AttributeDefinitions: [
-            { AttributeName: 'id', AttributeType: 'S' }
-          ],
-          KeySchema: [
-            { AttributeName: 'id', KeyType: 'HASH' }
-          ],
-          ProvisionedThroughput: {
-            ReadCapacityUnits: 1,
-            WriteCapacityUnits: 1,
-          }
-        }
-      },
-      stocksTable: {
-        Type: 'AWS::DynamoDB::Table',
-        Properties: {
-          TableName: 'Stocks',
-          AttributeDefinitions: [
-            { AttributeName: 'product_id', AttributeType: 'S' }
-          ],
-          KeySchema: [
-            { AttributeName: 'product_id', KeyType: 'HASH' }
-          ],
-          ProvisionedThroughput: {
-            ReadCapacityUnits: 1,
-            WriteCapacityUnits: 1,
-          }
-        }
-      },
-    },
-  }
+  catalogBatchProcess:
+    handler: catalog-batch-process/catalog-batch-process.handler
+    events:
+      - sqs:
+          batchSize: 5
+          arn:
+            Fn::GetAtt: [catalogItemsQueue, Arn]
+
+resources:
+    Resources:
+      productsTable:
+        Type: 'AWS::DynamoDB::Table'
+        Properties:
+          TableName: 'Products'
+          AttributeDefinitions: [{
+            AttributeName: 'id',
+            AttributeType: 'S'
+          }]
+          KeySchema: [{
+            AttributeName: 'id',
+            KeyType: 'HASH'
+          }]
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+
+      stocksTable:
+        Type: 'AWS::DynamoDB::Table'
+        Properties:
+          TableName: 'Stocks'
+          AttributeDefinitions: [{
+            AttributeName: 'product_id',
+            AttributeType: 'S'
+          }]
+          KeySchema: [{
+            AttributeName: 'product_id',
+            KeyType: 'HASH'
+          }]
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+
+      catalogItemsQueue:
+        Type: 'AWS::SQS::Queue'
+        Properties:
+          QueueName: catalogItemsQueue
+
+      createProductTopic:
+        Type: 'AWS::SNS::Topic'
+        Properties:
+          TopicName: createProductTopic
+
+      emailSubscription:
+        Type: 'AWS::SNS::Subscription'
+        Properties:
+          Endpoint: yury.shemelev@gmail.com
+          Protocol: email
+          TopicArn: {'Ref': 'createProductTopic'}

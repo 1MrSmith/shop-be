@@ -26,10 +26,7 @@ export const handler = async (event) => {
 
         const url = await getSignedUrl(s3Client, putObjectCommand)
 
-        return createSuccessResponse(200, {
-            fileName: name,
-            url,
-        })
+        return createSuccessResponse(200, url)
     } catch (e) {
         return createErrorResponse(new InternalServerRequestError('Internal server error'))
     }
