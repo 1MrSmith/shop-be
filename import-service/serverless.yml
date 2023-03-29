@@ -47,6 +47,10 @@ functions:
       - http:
           path: api/import
           method: get
+          cors: true
+          authorizer:
+            arn: arn:aws:lambda:${self:provider.region}:954413109841:function:authorization-service-dev-basicAuthorizer
+            identitySource: method.request.header.Authorization
           request:
           parameters:
             querystrings:
