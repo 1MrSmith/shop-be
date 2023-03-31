@@ -1,0 +1,26 @@
+service: authorization-service
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-functions-base-path
+  - serverless-webpack
+
+frameworkVersion: '3.25'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: eu-west-1
+  environment:
+    LOGIN: ${env['MrSmith']}
+
+custom:
+  functionsBasePath: src/handlers
+  webpack:
+    webpackConfig: './webpack.config.js'
+    includeModules: true
+    keepOutputDirectory: true
+
+functions:
+  basicAuthorizer:
+    handler: basic-authorizer/basic-authorizer.handler
